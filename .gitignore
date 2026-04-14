@@ -1,0 +1,37 @@
+# dbt / BigQuery
+target/
+dbt_packages/
+dbt_packages/
+dbt_project/
+logs/
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+poetry.lock
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# BigQuery credentials
+*.json
+!packages/*.json

@@ -1,0 +1,52 @@
+version: 2
+
+sources:
+  - name: glamira_raw
+    description: "Raw data from BigQuery glamira_raw dataset. Chứa tất cả events từ website Glamira (e-commerce trang sức). Mỗi dòng = 1 event từ user action."
+    database: todo-459814
+    schema: glamira_raw
+
+    tables:
+      - name: raw_events
+        description: "Bảng events chính. Chứa tất cả user actions trên website: page_view, add_to_cart, checkout_success, select_product_option, v.v. Data nằm ở dạng JSON trong cart_products column."
+        columns:
+          - name: _id
+            description: "UUID event - primary key của bảng raw."
+          - name: collection
+            description: "Loại event. VD: checkout_success, select_product_option, page_view. Dùng để filter loại event cần phân tích."
+          - name: device_id
+            description: "UUID thiết bị user dùng để truy cập."
+          - name: ip
+            description: "IP address của user. Dùng để xác định vị trí địa lý."
+          - name: order_id
+            description: "Mã đơn hàng (có thể NULL cho event không phải checkout)."
+          - name: store_id
+            description: "ID của cửa hàng/website domain (VD: 43, 63)."
+          - name: time_stamp
+            description: "Unix timestamp (seconds) - thời gian xảy ra event."
+          - name: user_id_db
+            description: "User ID từ database. NULL cho khách vãng lai chưa đăng ký."
+          - name: user_agent
+            description: "User-Agent string từ trình duyệt."
+          - name: resolution
+            description: "Screen resolution của thiết bị. VD: 1920x1200."
+          - name: current_url
+            description: "URL của trang đang xem."
+          - name: cat_id
+            description: "Category ID của trang đang xem."
+          - name: cart_products
+            description: "JSON array chứa danh sách sản phẩm trong giỏ. VD: [{product_id, price, currency, amount}]. Đây là nguồn chính cho fact_sales_order."
+          - name: collect_id
+            description: "Tracking ID cho analytics."
+          - name: utm_source
+            description: "UTM source - nguồn traffic (VD: google, facebook, email)."
+          - name: utm_medium
+            description: "UTM medium - loại marketing (VD: cpc, email, organic)."
+          - name: option
+            description: "JSON array chứa tùy chọn sản phẩm (alloy, diamond, color...)."
+
+      - name: ip_locations_raw
+        description: "Bảng mapping IP → Location. Dùng để enrich dim_location với thông tin thành phố, quốc gia thực thay vì guesstimate từ IP prefix."
+
+      - name: product_names_raw
+        description: "Bảng mapping product_id → product_name. Dùng để enrich dim_product với tên sản phẩm thực thay vì Product + số."

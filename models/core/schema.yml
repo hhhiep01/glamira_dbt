@@ -1,0 +1,104 @@
+version: 2
+
+models:
+  - name: dim_customer
+    description: "Dimension table lưu thông tin khách hàng. Mỗi dòng = 1 customer_id duy nhất. Nguồn: stg_raw_events.user_id_db."
+    columns:
+      - name: customer_key
+        description: "Surrogate key tự động đánh số (1, 2, 3...). Primary key."
+        tests:
+          - unique
+          - not_null
+      - name: customer_id
+        description: "Natural key - ID khách hàng từ hệ thống e-commerce."
+        tests:
+          - unique
+          - not_null
+      - name: customer_email
+        description: "Email giả định cho khách đã đăng ký (customer_id + @example.com). NULL cho khách vãng lai."
+      - name: is_registered
+        description: "Cờ boolean - TRUE nếu khách đã đăng ký, FALSE nếu khách vãng lai."
+
+  - name: dim_product
+    description: "Dimension table lưu thông tin sản phẩm. Mỗi dòng = 1 product_id duy nhất. Nguồn: stg_raw_events (cart_products JSON)."
+    columns:
+      - name: product_key
+        description: "Surrogate key tự động đánh số (1, 2, 3...). Primary key."
+        tests:
+          - unique
+          - not_null
+      - name: product_id
+        description: "Natural key - ID sản phẩm từ hệ thống e-commerce."
+        tests:
+          - unique
+          - not_null
+      - name: product_name
+        description: "Tên sản phẩm giả định (Product + số thứ tự). Cần enrich từ product_names_raw."
+
+  - name: dim_store
+    description: "Dimension table lưu thông tin cửa hàng. Mỗi dòng = 1 store_id duy nhất. Nguồn: stg_raw_events."
+    columns:
+      - name: store_key
+        description: "Surrogate key tự động đánh số (1, 2, 3...). Primary key."
+        tests:
+          - unique
+          - not_null
+      - name: store_id
+        description: "Natural key - ID cửa hàng từ hệ thống."
+        tests:
+          - unique
+          - not_null
+      - name: store_domain
+        description: "Domain/category hint của cửa hàng (lấy từ cat_id đầu tiên)."
+      - name: country_hint
+        description: "Gợi ý quốc gia (hiện = 'Unknown'). Cần enrich từ store_master_data."
+
+  - name: dim_device
+    description: "Dimension table lưu thông tin thiết bị truy cập. Mỗi dòng = 1 device_id duy nhất. Nguồn: stg_raw_events.user_agent."
+    columns:
+      - name: device_key
+        description: "Surrogate key tự động đánh số (1, 2, 3...). Primary key."
+        tests:
+          - unique
+          - not_null
+      - name: device_id
+        description: "Natural key - UUID thiết bị từ hệ thống tracking."
+        tests:
+          - unique
+          - not_null
+      - name: user_agent
+        description: "User-Agent string đầy đủ từ trình duyệt."
+      - name: device_type
+        description: "Loại thiết bị suy luận từ user_agent: mobile, tablet, desktop."
+      - name: browser_name
+        description: "Tên trình duyệt suy luận từ user_agent: Chrome, Firefox, Safari, Edge, Unknown."
+      - name: os_name
+        description: "Hệ điều hành suy luận từ user_agent: Windows, macOS, Linux, Android, iOS, Unknown."
+      - name: is_mobile
+        description: "Cờ boolean - TRUE nếu thiết bị di động (Mobile/Android/iPhone)."
+
+  - name: dim_location
+    description: "Dimension table lưu thông tin định vị theo IP. Mỗi dòng = 1 IP duy nhất. Nguồn: stg_raw_events.ip."
+    columns:
+      - name: location_key
+        description: "Surrogate key - hash FARM_FINGERPRINT(ip). Primary key."
+        tests:
+          - unique
+          - not_null
+      - name: ip
+        description: "Địa chỉ IP từ raw_events."
+        tests:
+          - unique
+          - not_null
+      - name: city_name
+        description: "Tên thành phố (hiện = 'Unknown'). Cần enrich từ ip_locations_raw."
+      - name: region_name
+        description: "Vùng/quốc gia suy luận từ IP prefix. VD: Southeast Asia, Unknown."
+      - name: country_name
+        description: "Tên quốc gia suy luận từ IP prefix. VD: Vietnam, Unknown."
+      - name: country_code
+        description: "Mã quốc gia 2 ký tự. VD: VN, XX (Unknown)."
+      - name: source
+        description: "Nguồn dữ liệu: raw_events."
+      - name: updated_at
+        description: "Thời gian cập nhật record (TIMESTAMP)."

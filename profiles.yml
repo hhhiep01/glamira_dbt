@@ -1,0 +1,24 @@
+glamira_bigquery:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: service-account
+      project: todo-459814
+      dataset: glamira_raw
+      location: asia-southeast1
+      timeout: 300 seconds
+      priority: interactive
+      retries: 3
+      keyfile: D:/Hiep/keys/dbt-key.json
+
+    prod:
+      type: bigquery
+      method: service-account
+      project: todo-459814
+      dataset: glamira_transformed
+      location: asia-southeast1
+      timeout: 300 seconds
+      priority: interactive
+      retries: 3
+      keyfile: D:/Hiep/keys/dbt-key.json

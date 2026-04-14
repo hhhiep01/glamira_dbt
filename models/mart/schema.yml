@@ -1,0 +1,86 @@
+version: 2
+
+models:
+  - name: dim_date
+    description: "Date dimension table dùng cho phân tích time-based. Tự động sinh từ 2020-01-01 đến 2030-12-31 (11 năm). Dùng chung cho tất cả fact tables trong project."
+    columns:
+      - name: date_key
+        description: "Khóa ngày dạng YYYYMMDD. VD: 20200513. Primary key."
+        tests:
+          - unique
+          - not_null
+      - name: full_date
+        description: "Ngày đầy đủ dạng DATE. VD: 2020-05-13."
+        tests:
+          - not_null
+      - name: day_of_week
+        description: "Thứ trong tuần (1=Sunday, 2=Monday, ..., 7=Saturday)."
+        tests:
+          - not_null
+      - name: month_number
+        description: "Tháng trong năm (1-12)."
+        tests:
+          - not_null
+      - name: month_name
+        description: "Tên tháng đầy đủ bằng tiếng Anh. VD: January, May."
+        tests:
+          - not_null
+      - name: quarter_number
+        description: "Quý trong năm (Q1=1, Q2=2, Q3=3, Q4=4)."
+        tests:
+          - not_null
+      - name: year_number
+        description: "Năm. VD: 2020, 2021, 2022."
+        tests:
+          - not_null
+      - name: is_weekend
+        description: "Cờ boolean - TRUE nếu là Thứ Bảy (7) hoặc Chủ Nhật (1)."
+        tests:
+          - not_null
+
+  - name: fact_sales_order
+    description: "Bảng fact chính cho phân tích đơn hàng bán hàng. Mỗi dòng = 1 sản phẩm trong 1 đơn checkout thành công (collection = checkout_success). 1 đơn hàng có thể có nhiều sản phẩm. Nguồn: glamira_raw.raw_events."
+    columns:
+      - name: sales_order_key
+        description: "Khóa chính duy nhất. Hash FARM_FINGERPRINT(event_id || product_id). Dùng cho incremental deduplication."
+        tests:
+          - unique
+          - not_null
+      - name: order_id
+        description: "Mã đơn hàng từ hệ thống e-commerce."
+        tests:
+          - not_null
+      - name: event_id
+        description: "Event ID từ raw_events (global unique)."
+      - name: product_key
+        description: "Khóa ngoại trỏ đến dim_product. 0 = unknown product."
+        tests:
+          - not_null
+      - name: customer_key
+        description: "Khóa ngoại trỏ đến dim_customer. 0 = unknown customer."
+        tests:
+          - not_null
+      - name: date_key
+        description: "Khóa ngày YYYYMMDD trỏ đến dim_date. VD: 20200513."
+        tests:
+          - not_null
+      - name: location_key
+        description: "Khóa ngoại trỏ đến dim_location (theo IP). 0 = unknown location."
+      - name: device_key
+        description: "Khóa ngoại trỏ đến dim_device. 0 = unknown device."
+      - name: store_key
+        description: "Khóa ngoại trỏ đến dim_store. 0 = unknown store."
+      - name: order_timestamp
+        description: "Thời gian đặt hàng (TIMESTAMP). Dùng cho drill-down."
+        tests:
+          - not_null
+      - name: order_quantity
+        description: "Số lượng sản phẩm trong dòng (line item quantity)."
+        tests:
+          - not_null
+      - name: unit_price
+        description: "Đơn giá của sản phẩm. Null nếu không có trong cart_products JSON."
+      - name: currency
+        description: "Mã tiền tệ. VD: CHF, EUR, GBP. Lấy từ cart_products JSON."
+      - name: line_total
+        description: "Tổng tiền dòng = order_quantity × unit_price. Đơn vị theo currency."

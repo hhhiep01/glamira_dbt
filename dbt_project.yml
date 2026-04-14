@@ -1,0 +1,22 @@
+name: glamira_dbt
+version: 1.0.0
+config-version: 2
+
+profile: glamira_bigquery
+
+vars:
+  source_project: todo-459814
+  source_dataset: glamira_raw
+  target_dataset: glamira_transformed
+
+models:
+  glamira_dbt:
+    staging:
+      +schema: staging
+      +materialized: ephemeral
+    core:
+      +schema: core
+      +materialized: incremental
+    mart:
+      +schema: mart
+      +materialized: table
