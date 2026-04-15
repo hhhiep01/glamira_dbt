@@ -2,6 +2,24 @@
 
 Data transformation project using dbt for BigQuery with star schema design.
 
+## Dashboards
+
+### 01. Revenue Analysis
+Revenue by month, country, and product.
+🔗 [Open Dashboard](https://datastudio.google.com/s/msfztTeL6cM)
+
+### 02. Geographic Distribution
+Orders by country, top cities, and regions.
+🔗 [Open Dashboard](https://datastudio.google.com/s/mpCrYcSUw_M)
+
+### 03. Time-based Trends
+Revenue trends by month, day of week, quarter, and hour.
+🔗 [Open Dashboard](https://datastudio.google.com/s/mWw99xulpU4)
+
+### 04. Product Performance
+Top products, device types, browsers, and OS.
+🔗 [Open Dashboard](https://datastudio.google.com/s/tEJWLyfbumI)
+
 ## Project Structure
 
 ```
@@ -46,6 +64,21 @@ dim_customer ───────┤
 dim_date ────────────┘
 ```
 
+## Data Sources
+
+| Source Table | Description |
+|---|---|
+| `glamira_raw.raw_events` | Main event data from website |
+| `glamira_raw.ip_locations_raw` | IP to country/city mapping |
+| `glamira_raw.product_names_raw` | Product ID to name mapping |
+
+## Key Metrics
+
+- **Total Revenue**: ~800M CHF
+- **Total Orders**: ~26K orders
+- **Top Country**: United Kingdom, Vietnam
+- **Top Product**: Wedding Ring Noble Infinite 5mm
+
 ## Setup & Usage
 
 ```bash
@@ -53,14 +86,14 @@ dim_date ────────────┘
 poetry install
 
 # Run models
-dbt run
+poetry run dbt run
 
 # Run tests
-dbt test
+poetry run dbt test
 
 # Generate documentation
-dbt docs generate
-dbt docs serve
+poetry run dbt docs generate
+poetry run dbt docs serve
 ```
 
 ## Naming Conventions

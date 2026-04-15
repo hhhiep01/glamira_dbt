@@ -35,3 +35,4 @@ Thumbs.db
 # BigQuery credentials
 *.json
 !packages/*.json
+dbt_internal_packages/
