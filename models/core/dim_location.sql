@@ -30,10 +30,23 @@ location_enrichment AS (
 SELECT
     FARM_FINGERPRINT(ip) AS location_key
     , ip
-    , COALESCE(city_name, 'Unknown')         AS city_name
-    , COALESCE(region_name, 'Unknown')        AS region_name
-    , COALESCE(country_name, 'Unknown')       AS country_name
-    , COALESCE(country_code, 'XX')            AS country_code
-    , 'ip_locations_raw'                      AS source
-    , CURRENT_TIMESTAMP()                    AS updated_at
+    , COALESCE(city_name, 'Unknown')        AS city_name
+    , COALESCE(region_name, 'Unknown')       AS region_name
+    , COALESCE(country_name, 'Unknown')     AS country_name
+    , COALESCE(country_code, 'XX')          AS country_code
+    , 'ip_locations_raw'                    AS source
+    , CURRENT_TIMESTAMP()                   AS updated_at
 FROM location_enrichment
+
+UNION ALL
+
+-- Default row: key = -1 means "unknown IP / not applicable"
+SELECT
+    -1                          AS location_key
+    , 'Unknown'                  AS ip
+    , 'Unknown'                  AS city_name
+    , 'Unknown'                  AS region_name
+    , 'Unknown'                  AS country_name
+    , 'XX'                       AS country_code
+    , 'system'                   AS source
+    , CURRENT_TIMESTAMP()        AS updated_at

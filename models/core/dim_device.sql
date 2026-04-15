@@ -55,3 +55,15 @@ SELECT
     , os_name
     , is_mobile
 FROM numbered
+
+UNION ALL
+
+-- Default row: key = -1 means "unknown / not applicable device"
+SELECT
+    -1                          AS device_key
+    , 'Unknown'                  AS device_id
+    , 'Unknown'                  AS user_agent
+    , 'Unknown'                  AS device_type
+    , 'Unknown'                  AS browser_name
+    , 'Unknown'                  AS os_name
+    , FALSE                      AS is_mobile

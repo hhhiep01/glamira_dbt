@@ -26,6 +26,15 @@ product_enrichment AS (
 SELECT
     FARM_FINGERPRINT(CAST(product_id AS STRING)) AS product_key
     , product_id
-    , product_name
-    , CURRENT_TIMESTAMP()                         AS updated_at
+    , COALESCE(product_name, 'Unknown')           AS product_name
+    , CURRENT_TIMESTAMP()                        AS updated_at
 FROM product_enrichment
+
+UNION ALL
+
+-- Default row: key = -1 means "unknown / not applicable product"
+SELECT
+    -1                          AS product_key
+    , -1                         AS product_id
+    , 'Unknown'                  AS product_name
+    , CURRENT_TIMESTAMP()        AS updated_at

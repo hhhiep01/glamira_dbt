@@ -31,3 +31,12 @@ SELECT
     , store_domain
     , country_hint
 FROM numbered
+
+UNION ALL
+
+-- Default row: key = -1 means "unknown / not applicable store"
+SELECT
+    -1                          AS store_key
+    , 'Unknown'                  AS store_id
+    , 'Unknown'                  AS store_domain
+    , 'Unknown'                  AS country_hint

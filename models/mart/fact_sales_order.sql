@@ -40,13 +40,18 @@ fact AS (
       , s.event_id
       , s.order_id
       , s.product_id
-      , COALESCE(c.customer_key, 0)                                              AS customer_key
-      , COALESCE(p.product_key, 0)                                              AS product_key
-      , CAST(FORMAT_DATE('%Y%m%d', CAST(s.order_timestamp AS DATE)) AS INT64)   AS date_key
-      , COALESCE(l.location_key, 0)                                             AS location_key
-      , COALESCE(d.device_key, 0)                                              AS device_key
-      , COALESCE(st.store_key, 0)                                              AS store_key
-      , s.quantity                                                             AS order_quantity
+        -- COALESCE(..., -1): NULL FKs point to the default row (key = -1) in each dim
+        -- LEFT JOIN is kept so unmatched FKs still produce a fact row, not a drop
+      , COALESCE(c.customer_key, -1)                                              AS customer_key
+      , COALESCE(p.product_key,  -1)                                              AS product_key
+      , COALESCE(
+            CAST(FORMAT_DATE('%Y%m%d', CAST(s.order_timestamp AS DATE)) AS INT64),
+            -1
+        )                                                                          AS date_key
+      , COALESCE(l.location_key, -1)                                             AS location_key
+      , COALESCE(d.device_key,   -1)                                             AS device_key
+      , COALESCE(st.store_key,  -1)                                             AS store_key
+      , s.quantity                                                              AS order_quantity
       , s.order_timestamp
       , s.unit_price
       , s.line_total
@@ -54,7 +59,7 @@ fact AS (
     FROM staging s
     LEFT JOIN {{ ref('dim_customer') }} c ON CAST(s.customer_id AS STRING) = c.customer_id
     LEFT JOIN {{ ref('dim_product') }}   p ON s.product_id = p.product_id
-    LEFT JOIN {{ ref('dim_location') }}   l ON s.ip = l.ip
+    LEFT JOIN {{ ref('dim_location') }}  l ON s.ip = l.ip
     LEFT JOIN {{ ref('dim_device') }}     d ON s.device_id = d.device_id
     LEFT JOIN {{ ref('dim_store') }}      st ON s.store_id = st.store_id
 )

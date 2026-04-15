@@ -21,7 +21,11 @@ numbered AS (
         ROW_NUMBER() OVER (ORDER BY customer_id) AS customer_key
         , customer_id
         , is_registered
-        , CASE WHEN is_registered THEN customer_id || '@example.com' ELSE NULL END AS customer_email
+        -- Descriptive attributes: label instead of NULL
+        , CASE
+            WHEN is_registered THEN customer_id || '@example.com'
+            ELSE 'N/A'
+          END AS customer_email
     FROM source_data
 )
 
@@ -31,3 +35,12 @@ SELECT
     , customer_email
     , is_registered
 FROM numbered
+
+UNION ALL
+
+-- Default row: key = -1 means "unknown / not applicable"
+SELECT
+    -1                          AS customer_key
+    , 'Unknown'                  AS customer_id
+    , 'N/A'                      AS customer_email
+    , FALSE                      AS is_registered
