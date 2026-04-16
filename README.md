@@ -64,26 +64,26 @@ dim_date ────────────┘
 
 ## BigQuery Architecture
 
-Mỗi layer = 1 BigQuery dataset (chuẩn 1 dataset = 1 layer).
+Each layer = 1 BigQuery dataset (1 dataset per layer standard).
 
 ```
 BigQuery (project: todo-459814)
-├── glamira_raw/           ← Dataset: layer raw (source data)
-│   ├── raw_events         ← Table: source từ website
-│   ├── ip_locations       ← Table: IP → location
-│   └── product_names_raw  ← Table: product_id → name
+├── glamira_raw/           ← Dataset: raw layer (source data)
+│   ├── raw_events         ← Table: website events source
+│   ├── ip_locations       ← Table: IP → location mapping
+│   └── product_names_raw  ← Table: product_id → name mapping
 │
-├── glamira_staging/       ← Dataset: layer staging
+├── glamira_staging/       ← Dataset: staging layer
 │   └── stg_raw_events     ← View: parsed & cleaned events
 │
-├── glamira_core/          ← Dataset: layer core (dimensions)
+├── glamira_core/          ← Dataset: core layer (dimensions)
 │   ├── dim_customer       ← Table: customer dimension
 │   ├── dim_product        ← Table: product dimension
 │   ├── dim_location       ← Table: location dimension
 │   ├── dim_device         ← Table: device dimension
 │   └── dim_store          ← Table: store dimension
 │
-└── glamira_mart/          ← Dataset: layer mart (facts)
+└── glamira_mart/          ← Dataset: mart layer (facts)
     ├── dim_date           ← Table: date dimension (static)
     └── fact_sales_order   ← Table: sales fact (incremental)
 ```
@@ -105,11 +105,11 @@ glamira_mart        (fact_sales_order → incremental)
 
 ### Materialization Strategy
 
-| Layer | Materialization | Mục đích |
+| Layer | Materialization | Purpose |
 |-------|----------------|---------|
-| staging | view | Tiết kiệm chi phí, đọc từ raw |
-| core | incremental | Dimension - chỉ thêm record mới |
-| mart | table / incremental | Facts - incremental theo order |
+| staging | view | Cost efficient, reads from raw |
+| core | incremental | Dimension - append new records only |
+| mart | table / incremental | Facts - incremental by order |
 
 ## Data Sources
 
