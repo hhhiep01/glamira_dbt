@@ -35,17 +35,3 @@ SELECT
     , CAST(EXTRACT(YEAR FROM date_day) AS INT64) AS year_number
     , CASE WHEN EXTRACT(DAYOFWEEK FROM date_day) IN (1, 7) THEN TRUE ELSE FALSE END AS is_weekend
 FROM date_series
-
-UNION ALL
-
--- Default row: key = -1 means "unknown / not applicable date"
-SELECT
-    -1                          AS date_key
-    , NULL                      AS full_date
-    , NULL                      AS day_of_week
-    , 'Unknown'                  AS day_name
-    , NULL                      AS month_number
-    , 'Unknown'                  AS month_name
-    , NULL                      AS quarter_number
-    , NULL                      AS year_number
-    , FALSE                      AS is_weekend

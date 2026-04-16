@@ -113,5 +113,5 @@ SELECT
 FROM unnested
 WHERE rn = 1
 {% if is_incremental() %}
-WHERE event_id NOT IN (SELECT event_id FROM {{ this }})
+  AND event_id NOT IN (SELECT event_id FROM {{ this }})
 {% endif %}
