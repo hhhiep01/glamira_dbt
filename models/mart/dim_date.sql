@@ -1,7 +1,8 @@
 {{
     config(
         materialized='table',
-        schema='mart'
+        database='todo-459814',
+        schema='glamira_mart'
     )
 }}
 

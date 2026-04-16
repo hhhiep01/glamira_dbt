@@ -1,5 +1,9 @@
 version: 2
 
+# ─── MART LAYER ───
+# Dataset: glamira_mart
+# Chứa dim_date (static) và fact_sales_order (incremental)
+
 models:
   - name: dim_date
     description: "Date dimension table dùng cho phân tích time-based. Tự động sinh từ 2020-01-01 đến 2030-12-31 (11 năm). Dùng chung cho tất cả fact tables trong project."

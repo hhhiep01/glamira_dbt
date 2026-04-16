@@ -1,8 +1,8 @@
 {{
     config(
-        materialized='incremental',
-        schema='staging',
-        unique_key='event_id',
+        materialized='view',
+        database='todo-459814',
+        schema='glamira_staging',
         cluster_by=['order_timestamp'],
         on_schema_change='sync_all_columns'
     )

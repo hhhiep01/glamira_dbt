@@ -26,31 +26,29 @@ Top products, device types, browsers, and OS.
 dbt_project/
 ├── dbt_project.yml      # Project configuration
 ├── profiles.yml         # BigQuery connection
-├── pyproject.toml      # Poetry dependencies
-├── README.md          # Documentation
+├── pyproject.toml       # Poetry dependencies
+├── README.md            # Documentation
 │
 ├── macros/
 │   └── generate_surrogate_key.sql
 │
 ├── models/
 │   ├── staging/
-│   │   ├── sources.yml              # Source definitions
-│   │   └── stg_checkout_success.sql # Staging model
+│   │   ├── schema.yml              # Staging model docs
+│   │   └── stg_raw_events.sql       # Staging: parse raw events, unnest cart_products
 │   │
 │   ├── core/
-│   │   ├── schema.yml              # Core schema tests
-│   │   ├── dim_location.sql        # Location dimension
-│   │   ├── dim_product.sql        # Product dimension
-│   │   ├── dim_store.sql          # Store dimension
-│   │   ├── dim_device.sql         # Device dimension
-│   │   └── dim_customer.sql       # Customer dimension
+│   │   ├── schema.yml              # Core schema docs + tests
+│   │   ├── dim_customer.sql        # Customer dimension
+│   │   ├── dim_product.sql         # Product dimension
+│   │   ├── dim_location.sql        # Location dimension (IP → city/country)
+│   │   ├── dim_device.sql          # Device dimension (user-agent → browser/OS)
+│   │   └── dim_store.sql           # Store dimension
 │   │
 │   └── mart/
-│       ├── schema.yml              # Mart schema tests
-│       ├── dim_date.sql            # Date dimension
-│       └── fact_sales_order.sql   # Sales fact table
-│
-└── tests/
+│       ├── schema.yml              # Mart schema docs + tests
+│       ├── dim_date.sql            # Date dimension (2020-2030)
+│       └── fact_sales_order.sql    # Sales fact table (incremental)
 ```
 
 ## Data Model (Star Schema)
@@ -63,6 +61,55 @@ dim_device ─────────┤
 dim_customer ───────┤
 dim_date ────────────┘
 ```
+
+## BigQuery Architecture
+
+Mỗi layer = 1 BigQuery dataset (chuẩn 1 dataset = 1 layer).
+
+```
+BigQuery (project: todo-459814)
+├── glamira_raw/           ← Dataset: layer raw (source data)
+│   ├── raw_events         ← Table: source từ website
+│   ├── ip_locations       ← Table: IP → location
+│   └── product_names_raw  ← Table: product_id → name
+│
+├── glamira_staging/       ← Dataset: layer staging
+│   └── stg_raw_events     ← View: parsed & cleaned events
+│
+├── glamira_core/          ← Dataset: layer core (dimensions)
+│   ├── dim_customer       ← Table: customer dimension
+│   ├── dim_product        ← Table: product dimension
+│   ├── dim_location       ← Table: location dimension
+│   ├── dim_device         ← Table: device dimension
+│   └── dim_store          ← Table: store dimension
+│
+└── glamira_mart/          ← Dataset: layer mart (facts)
+    ├── dim_date           ← Table: date dimension (static)
+    └── fact_sales_order   ← Table: sales fact (incremental)
+```
+
+### Data Flow
+
+```
+glamira_raw         (source)
+      │
+      ▼
+glamira_staging     (stg_raw_events → view)
+      │
+      ▼
+glamira_core        (dim_* → incremental tables)
+      │
+      ▼
+glamira_mart        (fact_sales_order → incremental)
+```
+
+### Materialization Strategy
+
+| Layer | Materialization | Mục đích |
+|-------|----------------|---------|
+| staging | view | Tiết kiệm chi phí, đọc từ raw |
+| core | incremental | Dimension - chỉ thêm record mới |
+| mart | table / incremental | Facts - incremental theo order |
 
 ## Data Sources
 

@@ -7,16 +7,22 @@ profile: glamira_bigquery
 vars:
   source_project: todo-459814
   source_dataset: glamira_raw
-  target_dataset: glamira_transformed
 
+# ─── Cấu trúc chuẩn: 1 layer = 1 BigQuery dataset ───
+# database  = todo-459814 (BigQuery project)
+# schema    = glamira_staging, glamira_core, glamira_mart (BigQuery datasets)
+# materialized: view/table/incremental
 models:
   glamira_dbt:
     staging:
-      +schema: staging
-      +materialized: ephemeral
+      +database: todo-459814
+      +schema: glamira_staging
+      +materialized: view        # Staging layer dùng view (tiết kiệm chi phí)
     core:
-      +schema: core
-      +materialized: incremental
+      +database: todo-459814
+      +schema: glamira_core
+      +materialized: incremental # Dimensions - incremental cho hiệu quả
     mart:
-      +schema: mart
-      +materialized: table
+      +database: todo-459814
+      +schema: glamira_mart
+      +materialized: table       # Facts + Dim cố định - full refresh OK

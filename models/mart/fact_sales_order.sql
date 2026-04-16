@@ -1,7 +1,8 @@
 {{
     config(
         materialized='incremental',
-        schema='mart',
+        database='todo-459814',
+        schema='glamira_mart',
         unique_key='sales_order_key',
         cluster_by=['order_timestamp'],
         on_schema_change='sync_all_columns'

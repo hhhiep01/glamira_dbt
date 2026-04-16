@@ -1,0 +1,48 @@
+version: 2
+
+# ─── STAGING LAYER ───
+# Dataset: glamira_staging
+# Chuẩn dbt: staging models = ephemeral (chỉ dùng làm CTE trong core/mart)
+# Tuy nhiên vì cần reference trực tiếp từ dim/fact, dùng view để tiết kiệm cost
+
+models:
+  - name: stg_raw_events
+    description: "Staging model cho raw_events. Parse JSON cart_products, unnest thành row-per-product. Mỗi event có thể có nhiều sản phẩm trong giỏ."
+    config:
+      database: todo-459814
+      schema: glamira_staging
+      materialized: view          # Dùng view thay vì table - tiết kiệm chi phí BQ
+      cluster_by: [order_timestamp]
+      on_schema_change: sync_all_columns
+    columns:
+      - name: event_id
+        description: "UUID event từ raw_events._id. Dùng làm unique_key cho incremental."
+        tests:
+          - not_null
+          - unique
+      - name: event_type
+        description: "Loại event (checkout_success, select_product_option, page_view...)."
+      - name: device_id
+        description: "UUID thiết bị user."
+      - name: ip
+        description: "IP address user."
+      - name: order_id
+        description: "Mã đơn hàng. NULL cho non-checkout events."
+      - name: customer_id
+        description: "Customer ID từ user_id_db. NULL cho khách vãng lai."
+      - name: product_id
+        description: "Product ID từ cart_products JSON. NULL nếu không có trong giỏ."
+      - name: store_id
+        description: "ID cửa hàng/domain."
+      - name: user_agent
+        description: "User-Agent string."
+      - name: order_timestamp
+        description: "Thời gian event dạng TIMESTAMP."
+        tests:
+          - not_null
+      - name: unit_price
+        description: "Đơn giá đã parse (bỏ thousand separator). NULL nếu không có."
+      - name: currency
+        description: "Mã tiền tệ (CHF, EUR, GBP...)."
+      - name: quantity
+        description: "Số lượng sản phẩm trong dòng."

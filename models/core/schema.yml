@@ -1,5 +1,9 @@
 version: 2
 
+# ─── CORE LAYER ───
+# Dataset: glamira_core
+# Chứa dimension tables - incremental cho hiệu quả storage
+
 models:
   - name: dim_customer
     description: "Dimension table lưu thông tin khách hàng. Mỗi dòng = 1 customer_id duy nhất. Nguồn: stg_raw_events.user_id_db."

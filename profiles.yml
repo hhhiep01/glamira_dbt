@@ -1,11 +1,16 @@
 glamira_bigquery:
   target: dev
   outputs:
+    # ─── Dataset/schema được override ở model-level config ───
+    # Cấu trúc chuẩn: 1 dataset = 1 layer
+    # staging  → glamira_staging (dataset) / staging (schema)
+    # core     → glamira_core    (dataset) / core    (schema)
+    # mart     → glamira_mart    (dataset) / mart    (schema)
     dev:
       type: bigquery
       method: service-account
       project: todo-459814
-      dataset: glamira_raw
+      dataset: glamira_staging   # Default dataset, override ở model-level
       location: asia-southeast1
       timeout: 300 seconds
       priority: interactive
@@ -16,7 +21,7 @@ glamira_bigquery:
       type: bigquery
       method: service-account
       project: todo-459814
-      dataset: glamira_transformed
+      dataset: glamira_staging   # Default dataset, override ở model-level
       location: asia-southeast1
       timeout: 300 seconds
       priority: interactive

@@ -1,7 +1,8 @@
 {{
     config(
         materialized='incremental',
-        schema='core',
+        database='todo-459814',
+        schema='glamira_core',
         unique_key='location_key',
         on_schema_change='sync_all_columns'
     )
